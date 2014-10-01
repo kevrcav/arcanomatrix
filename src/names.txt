@@ -1,0 +1,27 @@
+- Fire
+: Component
+/ Cinder
+: Appliance
+/ Microwave
+/ Heater
+- Ice
+: Component
+/ Cooler
+/ Sublime
+: Appliance
+/ Freezer
+/ Microfridge
+- Lightning
+: Component
+/ Static
+/ Shock
+: Appliance
+/ Battery
+/ Charger
+- Sonic
+: Component
+/ Tenor
+/ Bass
+: Appliance
+/ Speaker
+/ Noise Maker
