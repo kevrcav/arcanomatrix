@@ -22,3 +22,15 @@ r100
 g46
 b254
 -
+:Element
+/Water
+r0
+g0
+b255
+-
+:Element
+/Tree
+r0
+g250
+b45
+-

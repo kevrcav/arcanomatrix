@@ -11,14 +11,8 @@ local puzzgen = {orbData = {}}
 function puzzgen:load()
     self.orbData = dataloader:loadOrbs("orbs.txt")
     self.names = dataloader:loadNames("names.txt")
-    eventmanager:registerListener("NextLevelEvent", listener:new(self, self.makeSpecificThing))
+    eventmanager:registerListener("NextLevelEvent", listener:new(self, self.makeRandomPuzzle))
     
-end
-
-function puzzgen:makeSpecificThing(BEvent)
-  BEvent.board:addOrb(orb:newElementOrb(250, 200, "Kevin", {r = 200, b = 120, g = 80}))
-  BEvent.board:addOrb(orb:newElementOrb(280, 200, "Richard", {r = 50, b = 255, g = 180}))
-  BEvent.board:addOrb(orb:newElementOrb(310, 200, "Cavanaugh", {r = 50, b = 200, g = 250}))
 end
 
 function puzzgen:makeRandomPuzzle(BEvent)
