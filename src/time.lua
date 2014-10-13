@@ -4,6 +4,7 @@ local listener = require 'listener'
 local eventmanager = require 'eventmanager'
 local vector = require 'vector'
 
+-- keeps track of the time the player has left in a level.
 local time = {center = vector:vect0(), size = vector:vect0(), startingTime = 30, currentTime = 30, countUpTime = 0}
 
 function time:load(x, y, w, h)
@@ -15,6 +16,7 @@ function time:load(x, y, w, h)
   self.size = vector:new(w or 0, h or 0)
 end
 
+-- in the standard update loop, drain the timer one second at a time. If the time ends, let the game know.
 function time:update()
   local dt = love.timer.getDelta()
   if self.timeOver then return end
@@ -25,10 +27,12 @@ function time:update()
   end
 end
 
+-- if we've won then set the drain time as the update hook
 function time:WinAchieved()
   self.updateListener.hook = self.drainTime
 end
 
+--Quickly remove time and add points to the score
 function time:drainTime()
   changeInTime = math.min(self.currentTime, love.timer.getDelta()*10)
   self.currentTime = self.currentTime - changeInTime
@@ -42,6 +46,7 @@ function time:drainTime()
   end
 end
 
+-- Wait a little before going to the next level
 function time:goToNextLevel()
   self.countUpTime = self.countUpTime + love.timer.getDelta()
   if self.countUpTime > 2 then
@@ -50,6 +55,7 @@ function time:goToNextLevel()
   end
 end
 
+-- when the puzzle resets reset the current time
 function time:reset(event)
   self.startingTime = event.time
   self.currentTime = event.time

@@ -3,9 +3,10 @@ local vector = require 'vector'
 local eventmanager = require'eventmanager'
 local listener = require'listener'
 
-
+-- a node for the matrix/graph. Can contain an orb.
 local node = {}
 
+-- create a new node
 function node:new(x, y)
   local o = {loc = vector:new(x, y), edges = {}}
   setmetatable(o, self)
@@ -26,6 +27,7 @@ function node:new(x, y)
     love.graphics.circle('fill', self.loc.x, self.loc.y, 13, 50)
   end
   
+  -- move if this is unstable, also move if the mouse is moving this
   function o:update()
     mouseloc = vector:new(love.mouse.getPosition())
     self.mouseHover = self.loc:distance(mouseloc) < 15
@@ -45,6 +47,7 @@ function node:new(x, y)
     end
   end
   
+  -- when the mouse is pressed, become grabbed if this contains no orb, otherwise it grabs the orb and goes away from this
   function o:mousedown(event)
     if self.disabled then return end
     mouseloc = vector:new(love.mouse.getPosition())
@@ -61,6 +64,7 @@ function node:new(x, y)
     end
   end
   
+  -- grab an orb if it's dropped within a reasonably close enough area
   function o:grabOrb(event)
     if not self.orb and self.loc:distance(event.orb.loc) < 15 then
       self.orb = event.orb
@@ -72,6 +76,7 @@ function node:new(x, y)
     end
   end
   
+  -- if the mouse is released and we were grabbed then this get dropped
   function o:mouseup()
     if self.mouseClick then 
       self.unstable = true
@@ -83,12 +88,14 @@ function node:new(x, y)
     self.mouseClick = false
   end
   
+  -- Gathers bordering values and gives those to a node
   function o:giveNodeValueToCounter()
     if self.orb then
       self.orb:giveOrbValue(self.edges, self, "Counter")
     end
   end
   
+  -- Same as above, but for goals instead of counters
   function o:giveNodeValueToGoal()
     if self.orb then
       self.orb:giveOrbValue(self.edges, self, "Goal")
@@ -123,6 +130,7 @@ function node:collideWithCircle(event)
   end
 end
 
+-- checks to see if this is directly connected to another node
 function node:HasEdgeTo(otherNode)
   local hasEdge = false
   table.foreach(self.edges, function(i, edge)
@@ -131,11 +139,13 @@ function node:HasEdgeTo(otherNode)
   return hasEdge
 end
 
+-- make this node uninteractable
 function node:Disable()
   if self.mouseClick then self:mouseup() end
   self.disabled = true
 end
 
+-- returns a node with nothing in it at the origin.
 function node:empty()
   o = {loc = vector:vect0()}
   setmetatable(o, self)

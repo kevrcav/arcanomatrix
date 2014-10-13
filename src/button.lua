@@ -4,6 +4,8 @@ local eventmanager = require 'eventmanager'
 local event = require 'event'
 local vector = require 'vector'
 
+-- a button is used to send a specific event when clicked. The event cannot contain any data.
+-- TODO: Write a descrption for each method
 local button = {center = vector:vect0(), size = vector:vect0(), name = "", eventtype = ""}
 
 function button:new(name, eventtype, x, y, w, h, inactive, layer)

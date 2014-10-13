@@ -4,7 +4,7 @@ local event = require 'event'
 local eventmanager = require 'eventmanager'
 local vector = require 'vector'
 
-
+-- the score keeps track of the player's score and the current level.
 local score = {numberCleared=0, points=0, center = vector.vect0(), size = vector.vect0()}
 
 function score:load(x, y, w, h)

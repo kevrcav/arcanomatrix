@@ -1,5 +1,6 @@
 local dataloader = {}
 
+-- this parses files to load orbs and the names used with those orbs
 function dataloader:loadOrbs(filename)
   local nextOrbData = {}
   local orbData = {}

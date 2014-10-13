@@ -3,8 +3,10 @@ local listener = require 'listener'
 local eventmanager = require 'eventmanager'
 local vector = require 'vector'
 
+-- the goal contains the pattern that needs to be matched.
 local goal = {loc = vector:vect0(), size = vector:vect0(), matrix = {}, name = ""}
 
+-- Set up listeners and set this size if it was not already given
 function goal:load(x, y, w, h)
   self.loc:set(vector:new(x, y))
   self.size:set(vector:new(w or 200, h or 100))
@@ -13,17 +15,20 @@ function goal:load(x, y, w, h)
   eventmanager:registerListener("NewGoalEvent", listener:new(self, self.newGoal))
 end
 
+-- adds the given amount to the given type to this
 function goal:addType(event)
   self.matrix[event.elem] = self.matrix[event.elem] or 0
   self.matrix[event.elem] = self.matrix[event.elem] + event.value
 end
 
+-- if there's a new goal we clear the board
 function goal:newGoal()
   self.matrix = {}
   eventmanager:sendEvent(event:new("UpdateGoalMatrix"))
   eventmanager:sendEvent(event:new("NewNameEvent"))
 end
 
+-- draw this (a box and border, a name, and some elements and numbers)
 function goal:draw()
   love.graphics.setColor(56, 28, 48)
   love.graphics.rectangle("fill", self.loc.x-self.size.x/2, self.loc.y-self.size.y/2, self.size.x, self.size.y)

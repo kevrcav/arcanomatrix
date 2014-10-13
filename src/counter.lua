@@ -3,6 +3,8 @@ local listener = require 'listener'
 local event = require 'event'
 local eventmanager = require 'eventmanager'
 
+-- The counter calculates the value of the nodes within the graph.
+-- TODO: Retrace steps through the maze of events I used to write this months ago
 local counter = {loc = vector:vect0(), size = vector:vect0(), matrix = {}}
 
 function counter:load(x, y, w, h)
@@ -15,17 +17,21 @@ function counter:load(x, y, w, h)
   eventmanager:registerListener("CounterResetEvent", listener:new(self, self.update))
 end
 
+-- update the counter each time the relevant bit of a gamestate changes
+-- the simplest way to do so is recalculate every time
 function counter:update()
   self.matrix = {}
   eventmanager:sendEvent(event:new("UpdateCounterMatrix"))
   eventmanager:sendEvent(event:new("WinCheckEvent"))
 end
 
+-- Extracts the info from a node
 function counter:getnodeinfo(event)
   self.matrix[event.elem] = self.matrix[event.elem] or 0
   self.matrix[event.elem] = self.matrix[event.elem] + event.value
 end
 
+-- Draws the counter on the screen
 function counter:draw()
   love.graphics.setColor(56, 28, 48)
   love.graphics.rectangle("fill", self.loc.x-self.size.x/2, self.loc.y-self.size.y/2, self.size.x, self.size.y)

@@ -10,16 +10,12 @@ local eventmanager = require'eventmanager'
 local event = require'event'
 local node = require'node'
 
-
-local World = {
-  circle = {x = 0, y = 0, on = false}
-}
-local t = socket.gettime()
-local gameTime = 0
-local curTime = 0
+-- the world contains no data
+local World = {}
 local bigFont
 local smallFont
 
+-- load the board and puzzle generator, load the fonts, and get the first level made
 function World:load() 
   love.graphics.setBackgroundColor(6, 19, 15)
   board:load()
@@ -36,10 +32,12 @@ function World:load()
   return
 end
 
+-- send an update event
 function World:update()
   eventmanager:sendEvent(event:new("UpdateEvent"))
 end
 
+-- send four draw layer events
 function World:draw() 
   eventmanager:sendEvent(event:new("DrawLayer0"))
   eventmanager:sendEvent(event:new("DrawLayer1"))
@@ -47,8 +45,7 @@ function World:draw()
   eventmanager:sendEvent(event:new("DrawLayer3"))
 end
 
-function World:quit()
-  
-end
-
+-- we do nothing on quit
+function World:quit() end
+ 
 return World

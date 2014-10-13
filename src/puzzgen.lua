@@ -8,6 +8,7 @@ local event = require 'event'
 
 local puzzgen = {orbData = {}}
 
+-- load in elements from text files and register a listener
 function puzzgen:load()
     self.orbData = dataloader:loadOrbs("orbs.txt")
     self.names = dataloader:loadNames("names.txt")
@@ -15,6 +16,8 @@ function puzzgen:load()
     
 end
 
+-- creates a random puzzle depending on the current level.
+-- TODO: Actually go in-depth on how this works
 function puzzgen:makeRandomPuzzle(BEvent)
   nodeRect = self:makeRect(BEvent.board.matrixzone.center, BEvent.board.matrixzone.size)
   orbRect = self:makeRect(BEvent.board.orbzone.center, BEvent.board.orbzone.size)
@@ -116,6 +119,7 @@ function puzzgen:makeRandomPuzzle(BEvent)
   return
 end
 
+-- Helper function for creating a name using the elements generated from the name file
 function puzzgen:makeName(matrix)
   local name = ""
   local i = 1
@@ -132,6 +136,7 @@ function puzzgen:makeName(matrix)
   return name
 end
 
+-- makes a specific puzzle useful for testing
 function puzzgen:makeNewPuzzle(event)
   board = event.board
   matrixzone = board.matrixzone
@@ -156,6 +161,7 @@ function puzzgen:makeNewPuzzle(event)
   board.timer.startingTime = 30
 end
 
+-- creates a rectangle from two vectors, a center and a size
 function puzzgen:makeRect(center, size)
   rect = {}
   rect.left = center.x - size.x/2

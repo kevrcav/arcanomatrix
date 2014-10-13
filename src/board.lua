@@ -9,7 +9,11 @@ local eventmanager = require 'eventmanager'
 local zone = require 'zone'
 local counter = require 'counter'
 
-local board = {matrixzone = zone:new(constants.WIDTH*3/8, constants.HEIGHT*5/8, 
+-- The board contains all the details about nodes, orbs, edges, and ensures
+-- they stay in play. It also holds onto the other zones.
+-- Since everything communicates as events, this is effectively storage.
+-- TODO: Write descriptions for methods
+local board = {matrixzone = zone:new(constants.WIDTH*3/8, constants.HEIGHT*5/8,
                                      constants.WIDTH*3/4-10, constants.HEIGHT*3/4-10, true), 
                orbzone = zone:new(constants.WIDTH*7/8, constants.HEIGHT*3/4,
                                   constants.WIDTH/4-10, constants.HEIGHT/2-10, true), 
@@ -56,7 +60,6 @@ function board:ensureNodeInPlay(event)
     self.matrixzone:moveToWithin(loc, radius)
   end
 end
-
 
 function board:draw()
   love.graphics.setColor(255, 255, 255)

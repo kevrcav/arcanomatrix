@@ -2,8 +2,10 @@ local eventmanager = require'eventmanager'
 local listener = require'listener'
 local node = require'node'
 
+-- an edge connects two nodes
 local edge = {node1 = node:empty(), node2 = node:empty()}
 
+-- creates a new edge
 function edge:new(nodea, nodeb)
   local o = {node1 = nodea, node2 = nodeb}
   o.rotation = o.node1.loc:getRotation(o.node2.loc)
@@ -20,6 +22,7 @@ function edge:new(nodea, nodeb)
     love.graphics.pop()
   end
   
+  -- adjust to line up between its two nodes
   function o:update()
     self.rotation = self.node1.loc:getRotation(self.node2.loc)
   end
@@ -32,6 +35,9 @@ function edge:new(nodea, nodeb)
   return o
 end
 
+-- given a node, return the node on the other side
+-- this assumes the given node is contained in this.
+-- TODO: make this function safer
 function edge:getOtherNode(node)
   if node==self.node1 then
     return self.node2

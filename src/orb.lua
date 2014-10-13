@@ -3,11 +3,14 @@ local listener = require 'listener'
 local eventmanager = require 'eventmanager'
 local vector = require 'vector'
 
-
+-- an orb comes in two flavors, element and amplify. 
+-- An element orb is something like Fire, Ice, etc.
+-- An amplify orb is a number.
 local orb = {loc = vector:vect0(), label = "", value = 0, type = "", color = {r=0, g=0, b=0}}
 
-
+-- make function specific to element orbs
 local function makeNewElementOrb(neworb)
+  -- to give this orb value, we find all adjacent number nodes and poll their values
   function neworb:giveOrbValue(edges, nodeSelfIsOn, CounterOrGoal)
     NEvent = event:new("Give"..CounterOrGoal.."NodeValueEvent")
     NEvent.elem = self.label
@@ -22,6 +25,7 @@ local function makeNewElementOrb(neworb)
     eventmanager:sendEvent(NEvent)
   end
   
+  -- an element has no numberical value
   function neworb:getNumNodeValue()
     return 0
   end
@@ -29,11 +33,13 @@ local function makeNewElementOrb(neworb)
   return neworb
 end
 
+-- makes specific function for an amplify orb
 local function makeNewAmplifyOrb(neworb)
+  -- this cannot give a value, it is only worth numbers.
   function neworb:giveOrbValue(edges, nodeSelfIsOn)
-    
   end
   
+  -- return this's numerical value.
   function neworb:getNumNodeValue()
     return self.value
   end
@@ -41,16 +47,19 @@ local function makeNewAmplifyOrb(neworb)
   return neworb 
 end
 
+-- create an element orb
 function orb:newElementOrb(x, y, label, color)
   return makeNewElementOrb(self:new(x, y, label, "Element", color))
 end
 
+-- create an amplify orb
 function orb:newAmplifyOrb(x, y, value)
   neworb = makeNewAmplifyOrb(self:new(x, y, tostring(value), "Value", {r=255, g=255, b=255}))
   neworb.value = value
   return neworb
 end
 
+-- create a new orb of the given type
 function orb:new(x, y, label, type, color)
    local o = {loc = vector:new(x, y), label = label, type = type, color = color}
    setmetatable(o, self)
@@ -63,6 +72,7 @@ function orb:new(x, y, label, type, color)
     love.graphics.printf(self.label:sub(1, 1), self.loc.x-13, self.loc.y-13, 26, 'center')
   end
   
+  -- interact with the mouse and move if currently colliding with a wall or another orb
   function o:update()
     mouseloc = vector:new(love.mouse.getPosition())
     self.mouseHover = self.loc:distance(mouseloc) < 13
@@ -82,6 +92,7 @@ function orb:new(x, y, label, type, color)
     end
   end
   
+  -- callback for when the mouse is pressed. If the mouse is over this, this is clicked.
   function o:mousedown(event)
     if self.disabled then return end
     mouseloc = vector:new(love.mouse.getPosition())
@@ -90,6 +101,7 @@ function orb:new(x, y, label, type, color)
     return self.mouseClick
   end
   
+  -- if this was clicked, become unclicked then let things know an orb was dropped
   function o:mouseup()
     if self.mouseClick then
       self.unstable = true
@@ -104,6 +116,7 @@ function orb:new(x, y, label, type, color)
     end
   end
   
+  -- register listeners
   eventmanager:registerListener("DrawLayer2", listener:new(o, o.draw))
   eventmanager:registerListener("UpdateEvent", listener:new(o, o.update))
   eventmanager:registerListener("MouseReleasedEvent", listener:new(o, o.mouseup))
@@ -113,12 +126,13 @@ function orb:new(x, y, label, type, color)
   return o
 end
 
+-- make this orb uninteractable
 function orb:Disable()
   if self.mouseClick then self:mouseup() end
   self.disabled = true
 end
 
-
+-- checks if this collides with a circle
 function orb:collideWithCircle(event)
   loc = event.loc
   radius = event.radius
