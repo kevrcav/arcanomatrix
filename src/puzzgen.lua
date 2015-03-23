@@ -28,7 +28,7 @@ function puzzgen:makeRandomPuzzle(BEvent)
   
   math.randomseed(os.time())
   
-  for i = 1, math.floor(BEvent.board.score.numberCleared/3)+3 do
+  for i = 1, math.floor(BEvent.board.score.numberCleared/3)+4 do
     table.insert(nodes, node:new(math.random(nodeRect.left+15, nodeRect.right-15), 
                                  math.random(nodeRect.up+15, nodeRect.down-15)))
   end
@@ -102,8 +102,6 @@ function puzzgen:makeRandomPuzzle(BEvent)
     node.orb = nil
   end)
   
-  eventmanager:sendEvent(event:new("CounterResetEvent"))
-  
   table.foreach(nodes, function(i, node)
     BEvent.board:addNode(node)
   end)
@@ -112,10 +110,19 @@ function puzzgen:makeRandomPuzzle(BEvent)
   end)
   table.foreach(edges, function(i, edge)
     BEvent.board:addEdge(edge)
+    local function AddOtherEdges(i, otherEdge)
+      edge.sharesNode[otherEdge] = true
+    end
+    table.foreach(edge.node1.edges, AddOtherEdges)
+    table.foreach(edge.node2.edges, AddOtherEdges)
+  end)
+  table.foreach(edges, function(i, edge)
+    edge:NodeMoved()
   end)
   BEvent.board.timer.currentTime = 30+BEvent.board.score.numberCleared*2
   BEvent.board.timer.startingTime = 30+BEvent.board.score.numberCleared*2
   BEvent.board.goal.name = self:makeName(BEvent.board.goal.matrix)
+  eventmanager:sendEvent(event:new("CounterResetEvent"))
   return
 end
 
@@ -142,7 +149,7 @@ function puzzgen:makeNewPuzzle(event)
   matrixzone = board.matrixzone
   orbzone = board.orbzone
   
-  A, B, C, D = node:new(150, 100), node:new(200, 150), node:new(100, 175), node:new(75, 100)
+  A, B, C, D = node:new(150, 300), node:new(200, 350), node:new(100, 375), node:new(75, 300)
   board:addEdge(edge:new(A, B))
   board:addEdge(edge:new(A, C))
   board:addEdge(edge:new(C, B))
@@ -157,8 +164,8 @@ function puzzgen:makeNewPuzzle(event)
   board:addOrb(orb:newAmplifyOrb(300, 400, 2))
   board:addOrb(orb:newAmplifyOrb(300, 300, 3))
   board.goal.name = "Yes! Hi 5!"
-  board.timer.currentTime = 30
-  board.timer.startingTime = 30
+  board.timer.currentTime = 1000
+  board.timer.startingTime = 1000
 end
 
 -- creates a rectangle from two vectors, a center and a size

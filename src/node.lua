@@ -35,6 +35,7 @@ function node:new(x, y)
       movedist = mouseloc - self.lastmouse
       self.loc = movedist + self.loc
       self.lastmouse = mouseloc
+      table.foreach(self.edges, function(i, edge) edge:NodeMoved() end)
     end
     if self.unstable then
       oldLoc = vector:new(self.loc.x, self.loc.y)
@@ -44,6 +45,7 @@ function node:new(x, y)
       CEvent.object = self
       eventmanager:sendEvent(CEvent)
       self.unstable = oldLoc ~= self.loc
+      table.foreach(self.edges, function(i, edge) edge:NodeMoved() end)
     end
   end
   

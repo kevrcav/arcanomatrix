@@ -1,5 +1,7 @@
 World = require'world'
 Controller = require'controller'
+local vector = require 'vector'
+local mathtest = require 'mathtest'
 
 function love:load()
   World:load()

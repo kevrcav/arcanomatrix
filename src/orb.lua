@@ -16,10 +16,7 @@ local function makeNewElementOrb(neworb)
     NEvent.elem = self.label
     local totalValue = 0
     table.foreach(edges, function(i, edge)
-      otherNode = edge:getOtherNode(nodeSelfIsOn)
-      if otherNode.orb then
-        totalValue = totalValue + otherNode.orb:getNumNodeValue()
-      end
+      totalValue = totalValue + edge:GetOtherNodeNumValue(nodeSelfIsOn)
     end)
     NEvent.value = totalValue
     eventmanager:sendEvent(NEvent)

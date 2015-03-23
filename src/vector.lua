@@ -63,6 +63,10 @@ function Vector:dot(vector)
   return self.x*vector.x + self.y*vector.y
 end
 
+function Vector:cross(vector)
+  return self.x*vector.y - self.y*vector.x
+end
+
 function Vector:distance(vector)
   return math.sqrt(math.pow(self.x-vector.x, 2)
                  + math.pow(self.y-vector.y, 2))

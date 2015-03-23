@@ -167,4 +167,13 @@ function board:clearBoard()
   eventmanager:sendEvent(NLEvent)
 end
 
+function board:BuildEdgeCollideTables()
+  function BuildCollideTable(iToRemove)
+    
+  end
+  for i,edge in ipairs(self.edges) do
+    
+  end
+end
+
 return board
