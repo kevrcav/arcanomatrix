@@ -36,7 +36,6 @@ end
 
 function Vector:multc(vector, c)
   newVector =  Vector:new(vector.x*c, vector.y*c)
-  love.graphics.print(tostring(newVector), 300, 25)
   return newVector
 end
   
@@ -119,9 +118,9 @@ Vector.__sub = function(v1, v2)
   return Vector:sub(v1, v2)
 end
 
-Vector.__mul = function(v1, v2)
-  return Vector:mul(v1, v2)
-end
+--Vector.__mul = function(v, c)
+  --return Vector:multc(v, c)
+--end
 
 Vector.__div = function(v1, v2)
   return Vector:div(v1, v2)

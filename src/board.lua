@@ -24,7 +24,8 @@ local board = {matrixzone = zone:new(constants.WIDTH*3/8, constants.HEIGHT*5/8,
                resetButton = button:new("Retry", "GameResetEvent", constants.WIDTH/2,
                                       constants.HEIGHT*2/3, constants.WIDTH*3/16-10, constants.HEIGHT/8-10, true, 3),
                winPhrases = {"Yes. Perfect.", "Just As Planned", "We are Great!", "Got It in One", "Too Fabulous to Stop"},
-               creditsOn = false}
+               creditsOn = false,
+               multipliers = {}}
 
 function board:load()
   self.counter:load(constants.WIDTH*7/8, constants.HEIGHT*3/8, constants.WIDTH/4-10, constants.HEIGHT/4-10)
@@ -156,7 +157,7 @@ function board:clearBoard()
     eventmanager:removeListenersForObject(orb)
   end)
   table.foreach(self.edges, function(i, edge)
-    eventmanager:removeListenersForObject(edge)
+    edge:clearListeners()
   end)
   self.nodes = {}
   self.orbs = {}

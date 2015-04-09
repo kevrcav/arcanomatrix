@@ -1,5 +1,6 @@
 local dataloader = require 'dataloader'
 local edge = require 'edge'
+local vector = require 'vector'
 local orb = require 'orb'
 local node = require 'node'
 local listener = require 'listener'
@@ -28,7 +29,7 @@ function puzzgen:makeRandomPuzzle(BEvent)
   
   math.randomseed(os.time())
   
-  for i = 1, math.floor(BEvent.board.score.numberCleared/3)+4 do
+  for i = 1, math.floor(BEvent.board.score.numberCleared/3)+3 do
     table.insert(nodes, node:new(math.random(nodeRect.left+15, nodeRect.right-15), 
                                  math.random(nodeRect.up+15, nodeRect.down-15)))
   end
@@ -96,11 +97,6 @@ function puzzgen:makeRandomPuzzle(BEvent)
       end
     end
   end
-  eventmanager:sendEvent(event:new("NewGoalEvent"))
-  
-  table.foreach(nodes, function(i, node)
-    node.orb = nil
-  end)
   
   table.foreach(nodes, function(i, node)
     BEvent.board:addNode(node)
@@ -119,7 +115,17 @@ function puzzgen:makeRandomPuzzle(BEvent)
   table.foreach(edges, function(i, edge)
     edge:NodeMoved()
   end)
+  
+  eventmanager:sendEvent(event:new("NewGoalEvent"))
+  table.foreach(nodes, function(i, node)
+    node.orb = nil
+    node.loc = vector:new(math.random(nodeRect.left+15, nodeRect.right-15), math.random(nodeRect.up+15, nodeRect.down-15))
+  end)
+  table.foreach(edges, function(i, edge)
+    edge:NodeMoved()
+  end)
   BEvent.board.timer.currentTime = 30+BEvent.board.score.numberCleared*2
+  
   BEvent.board.timer.startingTime = 30+BEvent.board.score.numberCleared*2
   BEvent.board.goal.name = self:makeName(BEvent.board.goal.matrix)
   eventmanager:sendEvent(event:new("CounterResetEvent"))
