@@ -145,5 +145,13 @@ function orb:collideWithCircle(event)
   end
 end
 
+function orb:IsElement()
+  return self.type == "Element"
+end
+
+function orb:GetColor()
+  return self.color
+end
+
 return orb
 

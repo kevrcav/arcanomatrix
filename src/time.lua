@@ -8,10 +8,7 @@ local vector = require 'vector'
 local time = {center = vector:vect0(), size = vector:vect0(), startingTime = 30, currentTime = 30, countUpTime = 0}
 
 function time:load(x, y, w, h)
-  eventmanager:registerListener("LevelWonEvent", listener:new(self, self.WinAchieved))
   self.updateListener = listener:new(self, self.update)
-  eventmanager:registerListener("UpdateEvent", self.updateListener)
-  eventmanager:registerListener("DrawLayer0", listener:new(self, self.draw))
   self.center = vector:new(x or 0, y or 0)
   self.size = vector:new(w or 0, h or 0)
 end
@@ -34,7 +31,7 @@ end
 
 --Quickly remove time and add points to the score
 function time:drainTime()
-  changeInTime = math.min(self.currentTime, love.timer.getDelta()*10)
+  changeInTime = math.min(self.currentTime, love.timer.getDelta()*1000)
   self.currentTime = self.currentTime - changeInTime
   DEvent = event:new("TimeDrainEvent")
   DEvent.timeDrained = changeInTime

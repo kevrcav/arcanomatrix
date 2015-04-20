@@ -1,5 +1,6 @@
 local puzzgen = require 'puzzgen'
 local board = require 'board'
+local timer = require 'timer'
 local orb = require 'orb'
 local edge = require 'edge'
 local Socket = require'socket'
@@ -20,6 +21,7 @@ function World:load()
   love.graphics.setBackgroundColor(6, 19, 15)
   board:load()
   puzzgen:load()
+  timer:load()
   NEvent = event:new("NextLevelEvent")
   NEvent.board = board
   eventmanager:sendEvent(NEvent)

@@ -1,12 +1,14 @@
 local eventmanager = require'eventmanager'
 local listener = require'listener'
+local timer = require 'timer'
+local shaders = require 'shaders'
 local multiplier_indicator = require 'multiplier_indicator'
 local event = require 'event'
 local vector = require 'vector'
 local node = require'node'
 
 -- an edge connects two nodes
-local edge = {node1 = node:empty(), node2 = node:empty(), sharesNode = {}, colliding = {}, numberColliding = 0, multipliers = {}}
+local edge = {node1 = node:empty(), node2 = node:empty(), sharesNode = {}, colliding = {}, numberColliding = 0, multipliers = {}, sourceNode = false}
 
 -- creates a new edge
 function edge:new(nodea, nodeb)
@@ -15,18 +17,7 @@ function edge:new(nodea, nodeb)
   setmetatable(o, self)
   self.__index = self
   
-  function o:draw()
-    love.graphics.push()
-    love.graphics.translate(self.node1.loc.x, self.node1.loc.y)
-    love.graphics.rotate(self.rotation)
-    love.graphics.setColor(232, 65, 68)
-    if o.numberColliding > 0 then
-      love.graphics.setColor(40, 180, 48)  
-    end
-    love.graphics.rectangle("fill", 0, 0, 
-                            (self.node2.loc-self.node1.loc):size() , 3)
-    love.graphics.pop()
-  end
+  
   
   eventmanager:registerListener("DrawLayer1", listener:new(o, o.draw))
   eventmanager:registerListener("EdgeMoved", listener:new(o, o.EdgeMovedListener))
@@ -34,6 +25,41 @@ function edge:new(nodea, nodeb)
   table.insert(o.node2.edges, o)
   
   return o
+end
+
+function edge:draw()
+  local edgeShader = shaders.elementNodeEdgeShader
+  love.graphics.push()
+  love.graphics.translate(self.node1.loc.x, self.node1.loc.y)
+  love.graphics.rotate(self.rotation)
+  if self.sourceNode then
+    love.graphics.setShader(edgeShader)
+    edgeShader:send("_elementColor", {self.sourceNodeColor.r/255, self.sourceNodeColor.g/255, self.sourceNodeColor.b/255, 1.0})
+    edgeShader:send("_node1Loc", {self.sourceNode.loc.x, constants.HEIGHT-self.sourceNode.loc.y})
+    edgeShader:send("t", timer:GetTime())
+  end
+  love.graphics.setColor(232, 65, 68)
+  if self.numberColliding > 0 then
+    love.graphics.setColor(40, 180, 48)  
+  end
+  love.graphics.rectangle("fill", 0, 0, 
+                          (self.node2.loc-self.node1.loc):size() , 3)
+  love.graphics.pop()
+  love.graphics.setShader()
+end
+
+function edge:OrbPlacedInNode()
+  local evconnect = self.node1:HasOrb() and self.node2:HasOrb() and self.node1.orb:IsElement() ~= self.node2.orb:IsElement()
+  if evconnect then
+    if self.node1.orb:IsElement() then
+      self.sourceNode = self.node1
+    else
+      self.sourceNode = self.node2
+    end
+    self.sourceNodeColor = self.sourceNode.orb:GetColor()
+  else
+    self.sourceNode = false
+  end
 end
 
 -- given a node, return the node on the other side

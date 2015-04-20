@@ -1,8 +1,8 @@
 :Element
 /Fire
 r255
-g64
-b0
+g100
+b50
 -
 :Element
 /Ice

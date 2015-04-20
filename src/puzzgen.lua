@@ -1,5 +1,7 @@
 local dataloader = require 'dataloader'
 local edge = require 'edge'
+local timer = require 'timer'
+local timer = require 'timer'
 local vector = require 'vector'
 local orb = require 'orb'
 local node = require 'node'
@@ -7,14 +9,18 @@ local listener = require 'listener'
 local eventmanager = require 'eventmanager'
 local event = require 'event'
 
-local puzzgen = {orbData = {}}
+local puzzgen = {orbData = {}, level = 1}
 
 -- load in elements from text files and register a listener
 function puzzgen:load()
     self.orbData = dataloader:loadOrbs("orbs.txt")
     self.names = dataloader:loadNames("names.txt")
     eventmanager:registerListener("NextLevelEvent", listener:new(self, self.makeRandomPuzzle))
-    
+    eventmanager:registerListener("LevelUpEvent", listener:new(self, self.NextLevel))
+end
+
+function puzzgen:NextLevel(e)
+  self.level = e.level
 end
 
 -- creates a random puzzle depending on the current level.
@@ -29,7 +35,7 @@ function puzzgen:makeRandomPuzzle(BEvent)
   
   math.randomseed(os.time())
   
-  for i = 1, math.floor(BEvent.board.score.numberCleared/3)+3 do
+  for i = 1, self.level+2 do
     table.insert(nodes, node:new(math.random(nodeRect.left+15, nodeRect.right-15), 
                                  math.random(nodeRect.up+15, nodeRect.down-15)))
   end
@@ -46,7 +52,7 @@ function puzzgen:makeRandomPuzzle(BEvent)
   for i = 1, #nodes-numElemNodes do
     local newOrb = orb:newAmplifyOrb(math.random(orbRect.left+13, orbRect.right-13),
                                      math.random(orbRect.up+13, orbRect.down-13), 
-                                     math.random(1, 3+math.floor(BEvent.board.score.numberCleared/2)))
+                                     math.random(1, 3+math.floor(self.level)))
     table.insert(orbs, newOrb)
     nodes[i+numElemNodes].orb = newOrb
   end
@@ -62,8 +68,8 @@ function puzzgen:makeRandomPuzzle(BEvent)
     end
   end)
   
-  local maxNumberEdges = #nodes*(#nodes-1)/2
-  local edgesToMake = math.random(#edges+1, maxNumberEdges)-#edges
+  local maxNumberEdges = 1--#nodes*(#nodes-1)/2
+  local edgesToMake = 1--math.random(#edges+1, maxNumberEdges)-#edges
   local nodesWithoutMaxEdges = {}
   table.foreach(nodes, function(i, node)
     if #node.edges < #nodes - 1 then
@@ -124,11 +130,10 @@ function puzzgen:makeRandomPuzzle(BEvent)
   table.foreach(edges, function(i, edge)
     edge:NodeMoved()
   end)
-  BEvent.board.timer.currentTime = 30+BEvent.board.score.numberCleared*2
   
-  BEvent.board.timer.startingTime = 30+BEvent.board.score.numberCleared*2
   BEvent.board.goal.name = self:makeName(BEvent.board.goal.matrix)
   eventmanager:sendEvent(event:new("CounterResetEvent"))
+  timer:StartTimer("LevelTimer")
   return
 end
 

@@ -1,5 +1,6 @@
 World = require'world'
 Controller = require'controller'
+local shadertest = require 'shadertest'
 
 function love:load()
   World:load()

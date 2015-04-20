@@ -59,6 +59,9 @@ function node:new(x, y)
       self.orb.grabbed = false
       self.orb = nil 
       eventmanager:sendEvent(event:new("OrbRemovedEvent"))
+      for i,edge in ipairs(self.edges) do
+        edge:OrbPlacedInNode()
+      end
       self.mouseClick = false
     end
     if self.mouseClick then
@@ -74,6 +77,9 @@ function node:new(x, y)
       self.orb.unstable = false
       self.orb.grabbed = true
       eventmanager:sendEvent(event:new("OrbPlacedEvent"))
+      for i,edge in ipairs(self.edges) do
+        edge:OrbPlacedInNode()
+      end
       return true
     end
   end
@@ -114,6 +120,10 @@ function node:new(x, y)
   eventmanager:registerListener("CircleCollideEvent", listener:new(o, o.collideWithCircle))
   eventmanager:registerListener("DisableGameObjectsEvent", listener:new(o, o.Disable))
   return o
+end
+
+function node:HasOrb()
+  return self.orb ~= nil
 end
 
 -- moves this and a colliding body if they're colliding

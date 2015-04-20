@@ -1,5 +1,7 @@
 local button = require 'button'
 local score = require 'score'
+local timer = require 'timer'
+local xp_meter = require 'xp_meter'
 local time = require 'time'
 local goal = require 'goal'
 local constants = require 'constants'
@@ -25,12 +27,13 @@ local board = {matrixzone = zone:new(constants.WIDTH*3/8, constants.HEIGHT*5/8,
                                       constants.HEIGHT*2/3, constants.WIDTH*3/16-10, constants.HEIGHT/8-10, true, 3),
                winPhrases = {"Yes. Perfect.", "Just As Planned", "We are Great!", "Got It in One", "Too Fabulous to Stop"},
                creditsOn = false,
-               multipliers = {}}
+               multipliers = {},
+               level = 1}
 
 function board:load()
   self.counter:load(constants.WIDTH*7/8, constants.HEIGHT*3/8, constants.WIDTH/4-10, constants.HEIGHT/4-10)
   self.goal:load(constants.WIDTH*7/8, constants.HEIGHT*1/8, constants.WIDTH/4-10, constants.HEIGHT/4-10)
-  self.timer:load(constants.WIDTH*3/8, constants.HEIGHT*3/16, constants.WIDTH*3/4-10, constants.HEIGHT/8-10)
+  xp_meter:load(constants.WIDTH*3/8, constants.HEIGHT*3/16, constants.WIDTH*3/4-10, constants.HEIGHT/7)
   self.score:load(constants.WIDTH*15/32, constants.HEIGHT*1/16, constants.WIDTH*9/16-10, constants.HEIGHT/8-10)
   eventmanager:registerListener("WinCheckEvent", listener:new(self, self.CheckForWin))
   eventmanager:registerListener("NodeInBoundsEvent", listener:new(self, self.ensureNodeInPlay))
@@ -40,6 +43,8 @@ function board:load()
   eventmanager:registerListener("StartNextLevelEvent", listener:new(self, self.clearBoard))
   eventmanager:registerListener("GameResetEvent", listener:new(self, self.reset))
   eventmanager:registerListener("ToggleCreditsEvent", listener:new(self, self.toggleCredits))
+  eventmanager:registerListener("LevelUpEvent", listener:new(self, self.NextLevel))
+  eventmanager:registerListener("GetClearXPEvent", listener:new(self, self.GetClearXP))
 end
 
 function board:addNode(node)
@@ -144,8 +149,24 @@ function board:CheckForWin()
   end)
   if self.winState then 
     eventmanager:sendEvent(event:new("DisableGameObjectsEvent")) 
-    eventmanager:sendEvent(event:new("LevelWonEvent"))
+    local levent = event:new("LevelWonEvent")
+    levent.xp = self:GetClearXP()
+    eventmanager:sendEvent(levent)
     self.announceText = self.winPhrases[math.random(1, #self.winPhrases)]
+  end
+end
+
+function board:NextLevel(e)
+  self.level = e.level
+end
+
+function board:GetClearXP(e)
+  local timeTaken = timer:GetTimer("LevelTimer")
+  local clearXP = 20 + ((self.level + 2) * 15 - timeTaken)  
+  if e then
+    e.xp = clearXP
+  else
+    return clearXP
   end
 end
 

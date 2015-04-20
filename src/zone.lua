@@ -1,5 +1,6 @@
 local eventmanager = require 'eventmanager'
 local listener = require 'listener'
+local shaders = require 'shaders'
 local vector = require 'vector'
 
 -- a zone is an area of the screen nodes and circles can reside. 
