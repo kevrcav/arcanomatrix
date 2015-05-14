@@ -1,11 +1,12 @@
 local vector = require 'vector'
 local listener = require 'listener'
+local burstfx = require 'burstfx'
 local event = require 'event'
 local eventmanager = require 'eventmanager'
 
 -- The counter calculates the value of the nodes within the graph.
 -- TODO: Retrace steps through the maze of events I used to write this months ago
-local counter = {loc = vector:vect0(), size = vector:vect0(), matrix = {}}
+local counter = {loc = vector:vect0(), size = vector:vect0(), matrix = {}, colors = {}}
 
 function counter:load(x, y, w, h)
   self.loc:set(vector:new(x, y))
@@ -20,8 +21,22 @@ end
 -- update the counter each time the relevant bit of a gamestate changes
 -- the simplest way to do so is recalculate every time
 function counter:update()
+  local currentScore = {}
+  for element,value in pairs(self.matrix) do
+    currentScore[element] = value
+  end
   self.matrix = {}
   eventmanager:sendEvent(event:new("UpdateCounterMatrix"))
+  local i = 0
+  local offset = 0
+  table.foreach(self.matrix, function(i, l) offset = offset+1 end)
+  offset = offset*5
+  for element,value in pairs(self.matrix) do
+    if currentScore[element] ~= self.matrix[element] and self.matrix[element] > 0 then
+      burstfx:new(self.loc.x+8, self.loc.y+10-offset+17*i, 30, 0.5, self.colors[element])
+    end
+    i = i + 1
+  end
   eventmanager:sendEvent(event:new("WinCheckEvent"))
 end
 
@@ -29,6 +44,7 @@ end
 function counter:getnodeinfo(event)
   self.matrix[event.elem] = self.matrix[event.elem] or 0
   self.matrix[event.elem] = self.matrix[event.elem] + event.value
+  self.colors[event.elem] = event.color
 end
 
 -- Draws the counter on the screen

@@ -45,6 +45,8 @@ function board:load()
   eventmanager:registerListener("ToggleCreditsEvent", listener:new(self, self.toggleCredits))
   eventmanager:registerListener("LevelUpEvent", listener:new(self, self.NextLevel))
   eventmanager:registerListener("GetClearXPEvent", listener:new(self, self.GetClearXP))
+  eventmanager:registerListener("XPGainFinishedEvent", listener:new(self, self.WaitForSwitch))
+  eventmanager:registerListener("TimerFinishedEvent", listener:new(self, self.OnTimerFinished))
 end
 
 function board:addNode(node)
@@ -70,8 +72,18 @@ end
 function board:draw()
   love.graphics.setColor(255, 255, 255)
   love.graphics.setFont(constants.HUGEFONT)
-  love.graphics.printf(self.announceText, 0, constants.HEIGHT/3, constants.WIDTH, 'center')
+  local scale = 1
+  if self.levelUpFanfare then
+    love.graphics.push()
+    local t = timer:GetCountdown("LevelUpFanfare")
+    scale = scale + math.max(math.sin((t+1)*math.pi), 0)*0.15
+    love.graphics.scale(scale)
+  end
+  love.graphics.printf(self.announceText, 0, constants.HEIGHT/3 * 1/scale, constants.WIDTH * 1/scale, 'center')
   love.graphics.setFont(constants.SMALLFONT)
+  if self.levelUpFanfare then
+    love.graphics.pop()
+  end
   if not self.creditsOn then return end
   love.graphics.setColor(0, 0, 0)
   love.graphics.printf("Designed and Programmed by Kabanaw.", self.matrixzone.center.x - self.matrixzone.size.x/2+10, 
@@ -156,13 +168,34 @@ function board:CheckForWin()
   end
 end
 
+function board:WaitForSwitch()
+  timer:StartCountdown("LevelSwitchTimer", 2)
+end
+
+function board:OnTimerFinished(e)
+  if e.timer == "LevelSwitchTimer" then
+    if self.leveledUp then
+      timer:StartCountdown("LevelUpFanfare", 2)
+      self.levelUpFanfare = true
+      self.leveledUp = false
+      self.announceText = "LEVEL UP!"
+    else
+      eventmanager:sendEvent(event:new("StartNextLevelEvent"))
+    end
+  elseif e.timer == "LevelUpFanfare" then
+    self.levelUpFanfare = false
+    eventmanager:sendEvent(event:new("StartNextLevelEvent"))
+  end
+end
+
 function board:NextLevel(e)
   self.level = e.level
+  self.leveledUp = true
 end
 
 function board:GetClearXP(e)
   local timeTaken = timer:GetTimer("LevelTimer")
-  local clearXP = 20 + ((self.level + 2) * 15 - timeTaken)  
+  local clearXP = (self.level+4) * 4 + math.max((self.level + 4) * 10 - timeTaken, 0)
   if e then
     e.xp = clearXP
   else
@@ -176,6 +209,7 @@ function board:clearBoard()
   end)
   table.foreach(self.orbs, function(i, orb)
     eventmanager:removeListenersForObject(orb)
+    orb:RemoveSprite()
   end)
   table.foreach(self.edges, function(i, edge)
     edge:clearListeners()

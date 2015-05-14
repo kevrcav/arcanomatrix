@@ -65,6 +65,7 @@ function node:new(x, y)
       self.mouseClick = false
     end
     if self.mouseClick then
+      eventmanager:sendEvent(event:new("NodeClickedEvent"))
       return true 
     end
   end
@@ -92,6 +93,7 @@ function node:new(x, y)
       DEvent.loc = self.loc
       DEvent.radius = 15
       eventmanager:sendEvent(DEvent)
+      eventmanager:sendEvent(event:new("NodeDroppedEvent"))
     end
     self.mouseClick = false
   end

@@ -3,34 +3,40 @@
 r255
 g100
 b50
+sprite sprites/fire.png
 -
 :Element
 /Ice
 r88
 g250
 b244
+sprite sprites/ice.png
 -
 :Element
 /Lightning
 r247
 g254
 b46
+sprite sprites/lightning.png
 -
 :Element
 /Sonic
 r100
 g46
 b254
+sprite sprites/sonic.png
 -
 :Element
 /Water
 r0
 g0
 b255
+sprite sprites/water.png
 -
 :Element
 /Nature
 r0
 g250
 b45
+sprite sprites/nature.png
 -

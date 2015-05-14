@@ -1,5 +1,10 @@
 local puzzgen = require 'puzzgen'
 local board = require 'board'
+local burstfx = require 'burstfx'
+local spritebatchmgr = require 'spritebatchmgr'
+local sfxmgr = require 'sfxmgr'
+local backgroundmusic = require 'backgroundmusic'
+local cheats = require 'cheats'
 local timer = require 'timer'
 local orb = require 'orb'
 local edge = require 'edge'
@@ -22,6 +27,11 @@ function World:load()
   board:load()
   puzzgen:load()
   timer:load()
+  cheats:load()
+  spritebatchmgr:load()
+  backgroundmusic:SetMusic("audio/Chippies.mp3")
+  backgroundmusic:SetVolume(0.05)
+  self:SetSFX()
   NEvent = event:new("NextLevelEvent")
   NEvent.board = board
   eventmanager:sendEvent(NEvent)
@@ -32,6 +42,15 @@ function World:load()
   constants.LARGEFONT = love.graphics.newFont("AvalonQuest.ttf", 40)
   love.graphics.setFont(constants.SMALLFONT)
   return
+end
+
+function World:SetSFX()
+  sfxmgr:NewSFX("click", "audio/pick_up.mp3")
+  sfxmgr:NewSFX("orbGrabbed", "audio/set_in_node.mp3")
+  sfxmgr:NewSFX("drop", "audio/drop.mp3")
+  sfxmgr:AddListeners("click", "NodeClickedEvent", "OrbClickedEvent")
+  sfxmgr:AddListeners("drop", "NodeDroppedEvent", "OrbNotGrabbedEvent")
+  sfxmgr:AddListeners("orbGrabbed", "OrbPlacedEvent")
 end
 
 -- send an update event

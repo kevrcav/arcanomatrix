@@ -1,7 +1,7 @@
 module(..., package.seeall)
 
-WIDTH = 800
-HEIGHT = 600
+WIDTH = 1024
+HEIGHT = 768
 INIT_JUMP_HEIGHT = 800
 JUMP_HEIGHT = INIT_JUMP_HEIGHT
 INIT_MAX_SPEED = 300
@@ -18,4 +18,5 @@ HASMAP = false
 HASCOMPASS = false
 SMALLFONT = love.graphics.newFont("AvalonQuest.ttf", 25)
 LARGEFONT = love.graphics.newFont("AvalonQuest.ttf", 40)
+LARGERFONT = love.graphics.newFont("AvalonQuest.ttf", 50)
 HUGEFONT = love.graphics.newFont("AvalonQuest.ttf", 75)

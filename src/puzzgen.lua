@@ -44,7 +44,7 @@ function puzzgen:makeRandomPuzzle(BEvent)
   for i = 1, numElemNodes do
     local newOrbData = self.orbData[math.random(1, #self.orbData)]
     local newOrb = orb:newElementOrb(math.random(orbRect.left+13, orbRect.right-13),
-                                     math.random(orbRect.up+13, orbRect.down-13), newOrbData.element, newOrbData.color)
+                                     math.random(orbRect.up+13, orbRect.down-13), newOrbData.element, newOrbData.color, newOrbData.spriteBatch)
     table.insert(orbs, newOrb)
     nodes[i].orb = newOrb
   end
@@ -52,7 +52,7 @@ function puzzgen:makeRandomPuzzle(BEvent)
   for i = 1, #nodes-numElemNodes do
     local newOrb = orb:newAmplifyOrb(math.random(orbRect.left+13, orbRect.right-13),
                                      math.random(orbRect.up+13, orbRect.down-13), 
-                                     math.random(1, 3+math.floor(self.level)))
+                                     math.random(1, self.level))
     table.insert(orbs, newOrb)
     nodes[i+numElemNodes].orb = newOrb
   end

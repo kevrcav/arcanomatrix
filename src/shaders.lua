@@ -45,5 +45,20 @@ shaders.xpBarBubble = love.graphics.newShader([[
   #endif
 ]])
 
+shaders.color_burst = love.graphics.newShader([[
+  
+  #ifdef PIXEL
+  extern vec2 burst_center;
+  extern number t;
+  extern number radius;
+  vec4 effect (vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords)
+  {
+    vec4 newColor = color;
+    newColor.a = abs(color.a * (radius - length(screen_coords - burst_center))/radius * sin(t*3.14159*2));
+    return newColor;
+  }
+  #endif
+]])
+
 
 return shaders

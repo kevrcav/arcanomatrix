@@ -1,5 +1,6 @@
 local dataloader = {}
 
+local spritebatchmgr = require 'spritebatchmgr'
 -- this parses files to load orbs and the names used with those orbs
 function dataloader:loadOrbs(filename)
   local nextOrbData = {}
@@ -21,6 +22,10 @@ function dataloader:loadOrbs(filename)
       nextOrbData.color.b = line:sub(2, #line)
     elseif line:sub(1, 1) == "/" then
       nextOrbData.element = line:sub(2, #line)
+    elseif line:find("sprite") then
+      local fileName = line:gsub("sprite ", "")
+      nextOrbData.spriteBatch = love.graphics.newSpriteBatch(love.graphics.newImage(fileName))
+      spritebatchmgr:addSpriteBatch(nextOrbData.spriteBatch)
     end
   end
   return orbData

@@ -14,6 +14,7 @@ local function makeNewElementOrb(neworb)
   function neworb:giveOrbValue(edges, nodeSelfIsOn, CounterOrGoal)
     NEvent = event:new("Give"..CounterOrGoal.."NodeValueEvent")
     NEvent.elem = self.label
+    NEvent.color = self.color
     local totalValue = 0
     table.foreach(edges, function(i, edge)
       totalValue = totalValue + edge:GetOtherNodeNumValue(nodeSelfIsOn)
@@ -45,8 +46,8 @@ local function makeNewAmplifyOrb(neworb)
 end
 
 -- create an element orb
-function orb:newElementOrb(x, y, label, color)
-  return makeNewElementOrb(self:new(x, y, label, "Element", color))
+function orb:newElementOrb(x, y, label, color, spriteBatch)
+  return makeNewElementOrb(self:new(x, y, label, "Element", color, spriteBatch))
 end
 
 -- create an amplify orb
@@ -57,12 +58,17 @@ function orb:newAmplifyOrb(x, y, value)
 end
 
 -- create a new orb of the given type
-function orb:new(x, y, label, type, color)
-   local o = {loc = vector:new(x, y), label = label, type = type, color = color}
+function orb:new(x, y, label, type, color, spriteBatch)
+   local o = {loc = vector:new(x, y), label = label, type = type, color = color, spriteBatch = spriteBatch}
+   if spriteBatch then o.spriteID = o.spriteBatch:add(x, y) end
    setmetatable(o, self)
    self.__index = self
    
   function o:draw()
+    if o.spriteID then
+      o.spriteBatch:set(o.spriteID, self.loc.x-13, self.loc.y-13)
+      return
+    end
     love.graphics.setColor(self.color.r, self.color.g, self.color.b)
     love.graphics.circle('fill', self.loc.x, self.loc.y, 13, 50)
     love.graphics.setColor(0, 0, 0)
@@ -95,6 +101,9 @@ function orb:new(x, y, label, type, color)
     mouseloc = vector:new(love.mouse.getPosition())
     self.mouseClick = self.loc:distance(mouseloc) < 13
     self.lastmouse = mouseloc
+    if (self.mouseClick) then
+      eventmanager:sendEvent(event:new("OrbClickedEvent"))
+    end
     return self.mouseClick
   end
   
@@ -109,6 +118,9 @@ function orb:new(x, y, label, type, color)
       BEvent.radius = 13
       DEvent.orb = self
       eventmanager:sendConsumableEvent(DEvent)
+      if not self.grabbed then
+        eventmanager:sendEvent(event:new("OrbNotGrabbedEvent"))
+      end
       eventmanager:sendConsumableEvent(BEvent)
     end
   end
@@ -127,6 +139,14 @@ end
 function orb:Disable()
   if self.mouseClick then self:mouseup() end
   self.disabled = true
+end
+
+function orb:RemoveSprite()
+  if self.spriteID then
+    self.spriteBatch:set(self.spriteID, 0, 0, 0, 0, 0)
+    self.spriteID = nil
+    self.spriteBatch = nil
+  end
 end
 
 -- checks if this collides with a circle
